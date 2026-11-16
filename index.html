@@ -607,9 +607,9 @@
             <textarea id="message" name="message" rows="4" required
               class="mt-1 w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent"></textarea>
           </div>
-          <button type="submit"
-            class="w-full rounded-md bg-ok px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110">
-            $ send --message
+          <button type="submit" id="sendBtn"
+            class="flex w-full items-center justify-center gap-2 rounded-md border border-ok/60 bg-ok/10 px-4 py-2.5 font-mono text-sm font-medium text-ok transition hover:bg-ok/20 disabled:cursor-wait disabled:opacity-60">
+            Send message <span aria-hidden="true">→</span>
           </button>
           <p id="formStatus" class="font-mono text-xs text-dim" aria-live="polite"></p>
         </form>
@@ -737,6 +737,8 @@
       const data = { name: f.elements.name.value, email: f.elements.email.value, message: f.elements.message.value };
 
       if (FORMSPREE_URL) {
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.disabled = true;
         status.textContent = 'sending...';
         try {
           const res = await fetch(FORMSPREE_URL, {
@@ -747,6 +749,7 @@
           status.textContent = res.ok ? '200 OK · message sent, thank you.' : 'error · please email me directly.';
           if (res.ok) f.reset();
         } catch { status.textContent = 'network error · please email me directly.'; }
+        sendBtn.disabled = false;
       } else {
         const subject = encodeURIComponent('Portfolio enquiry from ' + data.name);
         const body = encodeURIComponent(data.message + '\n\n' + data.name + ' (' + data.email + ')');
