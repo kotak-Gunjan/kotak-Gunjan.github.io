@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<!--
+  Gunjan Kotak | Platform / DevOps Engineer portfolio
+  ---------------------------------------------------
+  Single file. No build step. Host on GitHub Pages, Netlify or Vercel.
+
+  Files to place next to this one:
+    - resume.pdf   (used by every "Download resume" button)
+
+  Search for "TODO" to find the spots that need your input.
+-->
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gunjan Kotak | Platform / DevOps Engineer</title>
+  <meta name="description" content="Platform / DevOps Engineer building cloud-to-edge infrastructure automation with K3s, OpenTofu, AWS and OpenStack. Author of k3s-client and cluster-builder on PyPI." />
+
+  <!-- Link previews on LinkedIn, Slack, WhatsApp etc. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Gunjan Kotak | Platform / DevOps Engineer" />
+  <meta property="og:description" content="Cloud-to-edge infrastructure automation. Author of k3s-client and cluster-builder on PyPI." />
+  <meta property="og:url" content="https://kotak-gunjan.github.io/" />
+  <meta name="twitter:card" content="summary" />
+
+  <!-- Favicon: a small terminal prompt, drawn inline so no extra file is needed -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Ctext x='10' y='42' font-family='monospace' font-size='30' font-weight='700' fill='%233fb950'%3E%3E_%3C/text%3E%3C/svg%3E" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Apply the saved theme before the page paints, so there is no flash -->
+  <script>
+    try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light'); } catch (e) {}
+  </script>
+
+  <!-- Tailwind via CDN (fine for a static portfolio; no build needed) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Colours come from CSS variables, so the dark/light toggle only swaps the variables.
+    const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: v('bg'), panel: v('panel'), line: v('line'),
+            ink: v('ink'), dim: v('dim'), ok: v('ok'), accent: v('accent'), warn: v('warn'),
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* ---------- Theme colours (space-separated RGB) ---------- */
+    :root {                       /* dark, GitHub-style (default) */
+      --bg: 13 17 23;  --panel: 22 27 34;  --line: 48 54 61;
+      --ink: 230 237 243;  --dim: 139 148 158;
+      --ok: 63 185 80;  --accent: 88 166 255;  --warn: 210 153 34;
+      color-scheme: dark;
+    }
+    html.light {                  /* light */
+      --bg: 255 255 255;  --panel: 246 248 250;  --line: 208 215 222;
+      --ink: 31 35 40;  --dim: 89 99 110;
+      --ok: 26 127 55;  --accent: 9 105 218;  --warn: 154 103 0;
+      color-scheme: light;
+    }
+    body { transition: background-color .25s, color .25s; }
+
+    /* Subtle grid backdrop for the hero, like a dashboard canvas */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgb(var(--line) / .35) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--line) / .35) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+    }
+    /* Blinking terminal cursor */
+    .cursor::after { content: '▋'; margin-left: 2px; animation: blink 1s steps(1) infinite; color: rgb(var(--ok)); }
+    @keyframes blink { 50% { opacity: 0; } }
+    /* Pulsing status dot */
+    .pulse { animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+    /* ASCII diagrams keep their spacing and scroll on small screens */
+    pre.diagram { white-space: pre; overflow-x: auto; }
+    /* Fade-in on scroll */
+    .reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.show { opacity: 1; transform: none; }
+    /* Scroll progress bar under the nav */
+    #progress { transform-origin: left; transform: scaleX(0); }
+    /* Respect users who turn off animations */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .pulse, .cursor::after { animation: none; }
+    }
+  </style>
+</head>
+
+<body class="bg-bg font-sans text-ink antialiased">
+
+  <!-- ============================== NAV ============================== -->
+  <header class="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur">
+    <nav class="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
+      <a href="#top" class="font-mono text-sm"><span class="text-ok">~/</span>gunjan-kotak</a>
+
+      <ul class="hidden gap-6 font-mono text-xs text-dim md:flex">
+        <li><a class="hover:text-ink" href="#skills">stack</a></li>
+        <li><a class="hover:text-ink" href="#projects">case-studies</a></li>
+        <li><a class="hover:text-ink" href="#oss">open-source</a></li>
+        <li><a class="hover:text-ink" href="#experience">experience</a></li>
+        <li><a class="hover:text-ink" href="#contact">contact</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <!-- Dark / light toggle -->
+        <button id="themeToggle" aria-label="Switch colour theme"
+          class="rounded-md border border-line px-2.5 py-1.5 font-mono text-xs text-dim hover:text-ink">
+          <span id="themeIcon">☀</span>
+        </button>
+        <a href="resume.pdf" download
+           class="hidden rounded-md border border-line px-3 py-1.5 font-mono text-xs hover:border-accent hover:text-accent sm:inline-block">
+          resume.pdf ↓
+        </a>
+        <!-- Mobile menu button -->
+        <button id="menuBtn" aria-label="Open menu" aria-expanded="false"
+          class="rounded-md border border-line px-2.5 py-1.5 font-mono text-xs text-dim md:hidden">☰</button>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden border-t border-line px-5 py-3 md:hidden">
+      <ul class="space-y-2 font-mono text-sm text-dim">
+        <li><a href="#skills">stack</a></li>
+        <li><a href="#projects">case-studies</a></li>
+        <li><a href="#oss">open-source</a></li>
+        <li><a href="#experience">experience</a></li>
+        <li><a href="#contact">contact</a></li>
+        <li><a href="resume.pdf" download class="text-accent">resume.pdf ↓</a></li>
+      </ul>
+    </div>
+    <div id="progress" class="h-0.5 bg-ok"></div>
+  </header>
+
+  <main id="top">
+
+    <!-- ============================== 1. HERO ============================== -->
+    <section class="relative overflow-hidden">
+      <div class="grid-bg pointer-events-none absolute inset-0"></div>
+      <div class="relative mx-auto grid max-w-6xl gap-10 px-5 py-20 md:grid-cols-5 md:py-28">
+
+        <!-- Left: identity and value proposition -->
+        <div class="md:col-span-3">
+          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-panel px-3 py-1 font-mono text-xs text-dim">
+            <span class="pulse h-2 w-2 rounded-full bg-ok"></span>
+            Open to Platform / DevOps / RSE roles · UK
+          </div>
+          <h1 class="text-4xl font-bold tracking-tight md:text-6xl">Gunjan Kotak</h1>
+          <p class="mt-3 font-mono text-lg text-accent md:text-xl">Platform / DevOps Engineer</p>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-dim">
+            I automate infrastructure from the cloud to the edge, so applications deploy
+            with one command whether they land on AWS or a Raspberry Pi.
+            Author of two open-source Python libraries on PyPI for cluster provisioning and in-cluster orchestration.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="https://github.com/kotak-Gunjan" target="_blank" rel="noopener"
+               class="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-bg hover:opacity-90">GitHub</a>
+            <a href="https://linkedin.com/in/gunjan-kotak-76a444128" target="_blank" rel="noopener"
+               class="rounded-md border border-line px-4 py-2 text-sm hover:border-accent hover:text-accent">LinkedIn</a>
+            <a href="mailto:kotakgunjan5@gmail.com"
+               class="rounded-md border border-line px-4 py-2 text-sm hover:border-accent hover:text-accent">Email</a>
+            <a href="resume.pdf" download
+               class="rounded-md border border-line px-4 py-2 text-sm hover:border-accent hover:text-accent">Resume ↓</a>
+          </div>
+          <!-- "Now" line: update this whenever your focus changes -->
+          <p class="mt-6 font-mono text-xs text-dim">
+            <span class="text-warn">now:</span> integrating Headscale (WireGuard) networking into cluster provisioning
+          </p>
+        </div>
+
+        <!-- Right: terminal card (typed out by JS below) -->
+        <div class="md:col-span-2">
+          <div class="overflow-hidden rounded-lg border border-line bg-panel shadow-2xl">
+            <div class="flex items-center gap-2 border-b border-line px-4 py-2.5">
+              <span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
+              <span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
+              <span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
+              <span class="ml-2 font-mono text-xs text-dim">gunjan@platform: ~</span>
+            </div>
+            <pre id="terminal" class="min-h-[270px] overflow-x-auto p-4 font-mono text-[12.5px] leading-6 text-dim" aria-label="Terminal animation"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== 2. STATUS / METRICS ============================== -->
+    <!-- Every figure here is factual. Swap in your own measured numbers if you have them. -->
+    <section id="metrics" class="border-y border-line bg-panel">
+      <div class="mx-auto grid max-w-6xl grid-cols-2 px-5 md:grid-cols-5 md:divide-x md:divide-line">
+        <div class="py-6 md:px-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-dim">experience</p>
+          <p class="mt-1 text-2xl font-semibold"><span class="count" data-to="5">0</span>+ yrs</p>
+          <p class="text-xs text-dim">industry + research</p>
+        </div>
+        <div class="py-6 md:px-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-dim">pypi packages</p>
+          <p class="mt-1 text-2xl font-semibold"><span class="count" data-to="2">0</span></p>
+          <p class="text-xs text-dim">cluster-builder · k3s-client</p>
+        </div>
+        <div class="py-6 md:px-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-dim">infra targets</p>
+          <p class="mt-1 text-2xl font-semibold"><span class="count" data-to="3">0</span></p>
+          <p class="text-xs text-dim">AWS · OpenStack · Raspberry Pi</p>
+        </div>
+        <div class="py-6 md:px-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-dim">cpu archs / build</p>
+          <p class="mt-1 text-2xl font-semibold"><span class="count" data-to="3">0</span></p>
+          <p class="text-xs text-dim">amd64 · arm64 · armv7</p>
+        </div>
+        <div class="col-span-2 py-6 md:col-span-1 md:px-5">
+          <p class="font-mono text-[11px] uppercase tracking-wider text-dim">testbed</p>
+          <p class="mt-1 flex items-center gap-2 text-2xl font-semibold">
+            <span class="pulse h-2.5 w-2.5 rounded-full bg-ok"></span>E2E
+          </p>
+          <p class="text-xs text-dim">register → provision → deploy</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== 3. CORE COMPETENCIES ============================== -->
+    <section id="skills" class="reveal mx-auto max-w-6xl px-5 py-20">
+      <p class="font-mono text-xs text-ok">// 01</p>
+      <h2 class="mt-1 text-2xl font-semibold md:text-3xl">Core competencies</h2>
+
+      <!-- Each card is one competency group. Edit the <li> lists freely. -->
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div class="rounded-lg border border-line bg-panel p-5">
+          <p class="font-mono text-xs text-accent">cloud/infra</p>
+          <ul class="mt-3 space-y-1.5 text-sm text-dim">
+            <li>AWS (EC2, VPC, IAM)</li><li>OpenStack</li><li>Edge / Raspberry Pi</li><li>Headscale / WireGuard</li>
+          </ul>
+        </div>
+        <div class="rounded-lg border border-line bg-panel p-5">
+          <p class="font-mono text-xs text-accent">iac/config</p>
+          <ul class="mt-3 space-y-1.5 text-sm text-dim">
+            <li>OpenTofu (Terraform-compatible)</li><li>Ansible</li><li>Jinja2 templating</li><li>Helm</li>
+          </ul>
+        </div>
+        <div class="rounded-lg border border-line bg-panel p-5">
+          <p class="font-mono text-xs text-accent">containers/ci-cd</p>
+          <ul class="mt-3 space-y-1.5 text-sm text-dim">
+            <li>Kubernetes / K3s</li><li>Docker, buildx, Harbor</li><li>Marathon (Apache Mesos)</li><li>GitHub Actions, GitLab CI</li>
+          </ul>
+        </div>
+        <div class="rounded-lg border border-line bg-panel p-5">
+          <p class="font-mono text-xs text-accent">observability/data</p>
+          <ul class="mt-3 space-y-1.5 text-sm text-dim">
+            <li>Grafana</li><li>InfluxDB</li><li>MongoDB</li><li>PostgreSQL</li>
+          </ul>
+        </div>
+        <div class="rounded-lg border border-line bg-panel p-5">
+          <p class="font-mono text-xs text-accent">languages</p>
+          <ul class="mt-3 space-y-1.5 text-sm text-dim">
+            <li>Python</li><li>Bash</li><li>Java (Spring Boot)</li><li>YAML / HCL</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== 4. CASE STUDIES ============================== -->
+    <section id="projects" class="border-t border-line">
+      <div class="reveal mx-auto max-w-6xl px-5 py-20">
+        <p class="font-mono text-xs text-ok">// 02</p>
+        <h2 class="mt-1 text-2xl font-semibold md:text-3xl">Engineering case studies</h2>
+        <p class="mt-3 max-w-2xl text-dim">From Swarmchestrate, an EU Horizon and UKRI funded platform for running applications across cloud and edge resources.</p>
+
+        <!-- Tabs: buttons switch the visible case study (see JS) -->
+        <div class="mt-10 flex flex-wrap gap-2 font-mono text-xs" role="tablist">
+          <button class="tab rounded-md border border-line px-3 py-2" role="tab" data-tab="cs1">01_https-at-the-edge</button>
+          <button class="tab rounded-md border border-line px-3 py-2" role="tab" data-tab="cs2">02_cluster-provisioning</button>
+          <button class="tab rounded-md border border-line px-3 py-2" role="tab" data-tab="cs3">03_k3s-client</button>
+        </div>
+
+        <!-- ---------- Case study 1 ---------- -->
+        <article id="cs1" class="case mt-6 rounded-lg border border-line bg-panel" role="tabpanel">
+          <header class="border-b border-line p-6">
+            <h3 class="text-xl font-semibold">Automated HTTPS for microservices on edge clusters</h3>
+            <p class="mt-1 font-mono text-xs text-dim">Traefik · Ingress · ACME / Let's Encrypt · Helm</p>
+          </header>
+          <div class="grid gap-8 p-6 lg:grid-cols-2">
+            <div class="space-y-6 text-sm leading-relaxed">
+              <div>
+                <p class="font-mono text-xs text-warn">PROBLEM / LEGACY STATE</p>
+                <p class="mt-2 text-dim">Services were exposed through NodePort, which forces ports in the 30000+ range.
+                  Users could not reach apps on standard 80/443, and TLS certificates were left to each application.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">SOLUTION</p>
+                <p class="mt-2 text-dim">Building on a colleague's proof of concept, I implemented it in the platform using the Traefik
+                  ingress built into K3s with its native ACME resolver. The deployment library now generates the Ingress, the Traefik HelmChartConfig and a volume for
+                  certificate storage only when an app asks for public HTTPS.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">TOOLS &amp; TRADE-OFFS</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-dim">
+                  <li>Traefik ACME instead of cert-manager: fewer moving parts on low-resource edge nodes.</li>
+                  <li>HTTP-01 challenge needs the node to be publicly reachable on port 80.</li>
+                  <li>Conditional manifests keep internal-only apps free of extra components.</li>
+                </ul>
+              </div>
+              <div class="rounded-md border border-ok/40 bg-ok/10 p-4">
+                <p class="font-mono text-xs text-ok">RESULT</p>
+                <p class="mt-2">Apps are served on 80/443 with automatically issued and renewed certificates,
+                  with no manual certificate steps. Verified end to end with an industry partner's application on the project testbed.</p>
+              </div>
+            </div>
+<pre class="diagram rounded-md border border-line bg-bg p-4 font-mono text-[12px] leading-5 text-dim">
+  user ──https:443──▶ ┌──────────────────────┐
+                      │  Traefik (K3s)       │
+  Let's Encrypt ◀─────│  certResolver: "le"  │
+   (HTTP-01)          │  acme.json on PVC    │
+                      └──────────┬───────────┘
+                                 │ Ingress rule
+                                 ▼
+                      ┌──────────────────────┐
+                      │  Service: app-svc    │
+                      └──────────┬───────────┘
+                                 ▼
+                      ┌──────────────────────┐
+                      │  Pod(s) on edge node │
+                      └──────────────────────┘
+
+  generated per app:  Ingress · HelmChartConfig · PVC
+</pre>
+          </div>
+        </article>
+
+        <!-- ---------- Case study 2 ---------- -->
+        <article id="cs2" class="case mt-6 hidden rounded-lg border border-line bg-panel" role="tabpanel">
+          <header class="border-b border-line p-6">
+            <h3 class="text-xl font-semibold">Per-node cluster provisioning across cloud and edge</h3>
+            <p class="mt-1 font-mono text-xs text-dim">cluster-builder (co-developed, on PyPI) · OpenTofu · PostgreSQL · AWS · OpenStack</p>
+          </header>
+          <div class="grid gap-8 p-6 lg:grid-cols-2">
+            <div class="space-y-6 text-sm leading-relaxed">
+              <div>
+                <p class="font-mono text-xs text-warn">PROBLEM / LEGACY STATE</p>
+                <p class="mt-2 text-dim">Provisioning lived in one monolithic class with a single shared state.
+                  Adding or removing one node risked touching the whole cluster, and mixed providers caused duplicate provider blocks.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">SOLUTION</p>
+                <p class="mt-2 text-dim">Refactored to one OpenTofu workspace per node, rendered from templates.
+                  State is stored in PostgreSQL, with a separate schema per cluster so clusters stay isolated.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">TOOLS &amp; TRADE-OFFS</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-dim">
+                  <li>Per-node workspaces: safe single-node changes, at the cost of more state objects to manage.</li>
+                  <li>PostgreSQL backend: shared, lockable state without depending on a cloud bucket.</li>
+                  <li>OpenTofu version pinned for reproducible runs.</li>
+                </ul>
+              </div>
+              <div class="rounded-md border border-ok/40 bg-ok/10 p-4">
+                <p class="font-mono text-xs text-ok">RESULT</p>
+                <p class="mt-2">Nodes can be added or removed one at a time across AWS, OpenStack and Raspberry Pi.
+                  Provider duplication and edge node delete bugs were fixed, and AWS workers now wait for SSH before joining.</p>
+                <!-- TODO: add a measured number here if you have one (e.g. provisioning time before/after). -->
+              </div>
+            </div>
+<pre class="diagram rounded-md border border-line bg-bg p-4 font-mono text-[12px] leading-5 text-dim">
+  request: add node
+        │
+        ▼
+  ┌────────────────────┐   render   ┌───────────────────┐
+  │  cluster-builder   │──────────▶ │ templates → .tf   │
+  └─────────┬──────────┘            └─────────┬─────────┘
+            │                                 ▼
+            │                  ┌──────────────────────────┐
+            │                  │ tofu workspace: node-N   │
+            │                  └───┬─────────┬────────┬───┘
+            │                      ▼         ▼        ▼
+            │                    AWS    OpenStack  Raspberry Pi
+            ▼
+  ┌────────────────────────────┐
+  │ PostgreSQL                 │
+  │  schema: cluster_a  (state)│
+  │  schema: cluster_b  (state)│
+  └────────────────────────────┘
+</pre>
+          </div>
+        </article>
+
+        <!-- ---------- Case study 3 ---------- -->
+        <article id="cs3" class="case mt-6 hidden rounded-lg border border-line bg-panel" role="tabpanel">
+          <header class="border-b border-line p-6">
+            <h3 class="text-xl font-semibold">k3s-client: a safe deployment library for the Swarm Agent</h3>
+            <p class="mt-1 font-mono text-xs text-dim">Author &amp; lead developer · Python · Kubernetes SDK · Pydantic</p>
+          </header>
+          <div class="grid gap-8 p-6 lg:grid-cols-2">
+            <div class="space-y-6 text-sm leading-relaxed">
+              <div>
+                <p class="font-mono text-xs text-warn">PROBLEM / LEGACY STATE</p>
+                <p class="mt-2 text-dim">The agent drove the cluster by shelling out to kubectl. Errors were plain text,
+                  dry runs were not real, and there was no clean way to pin workloads to specific edge devices.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">SOLUTION</p>
+                <p class="mt-2 text-dim">Rebuilt on the official Python SDK with server-side apply and distinct field managers,
+                  real server-side dry runs, and node pinning using single-replica Deployments with hard node affinity.</p>
+              </div>
+              <div>
+                <p class="font-mono text-xs text-accent">TOOLS &amp; TRADE-OFFS</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-dim">
+                  <li>Single-caller (leader-only) design: simpler logic, no distributed locking needed.</li>
+                  <li>Default namespace only: smaller permission surface, less flexibility.</li>
+                  <li>Found injected service env vars breaking config validation; fixed with <code class="text-ink">enableServiceLinks: false</code>.</li>
+                </ul>
+              </div>
+              <div class="rounded-md border border-ok/40 bg-ok/10 p-4">
+                <p class="font-mono text-xs text-ok">RESULT</p>
+                <p class="mt-2">Typed, testable cluster operations with real dry runs before every change.
+                  Published on PyPI (<code>pip install k3s-client</code>) with versioned releases, unit tests and scripts for testing on real hardware.</p>
+              </div>
+            </div>
+<pre class="diagram rounded-md border border-line bg-bg p-4 font-mono text-[12px] leading-5 text-dim">
+  ┌──────────────┐  apply / remove / scale
+  │ Swarm Agent  │─────────────────────────┐
+  └──────────────┘                         ▼
+                              ┌─────────────────────────┐
+                              │ k3s-client              │
+                              │  · pydantic models      │
+                              │  · dry-run=All first    │
+                              │  · server-side apply    │
+                              └────────────┬────────────┘
+                                           │ Python SDK
+                                           ▼
+                              ┌─────────────────────────┐
+                              │ K3s API server          │
+                              └──┬──────────┬───────────┘
+                                 ▼          ▼
+                            node: pi5   node: aws-1
+                          (nodeAffinity pins each app)
+</pre>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================== 5. OPEN SOURCE & TOOLING ============================== -->
+    <section id="oss" class="border-t border-line">
+      <div class="reveal mx-auto max-w-6xl px-5 py-20">
+        <p class="font-mono text-xs text-ok">// 03</p>
+        <h2 class="mt-1 text-2xl font-semibold md:text-3xl">Open source &amp; tooling</h2>
+        <p class="mt-3 max-w-2xl text-dim">Version badges update automatically from PyPI.</p>
+
+        <div class="mt-10 grid gap-4 md:grid-cols-3">
+
+          <!-- k3s-client -->
+          <div class="flex flex-col rounded-lg border border-line bg-panel p-5 hover:border-accent">
+            <div class="flex items-center justify-between gap-2">
+              <a href="https://github.com/Swarmchestrate/k3s-client" target="_blank" rel="noopener"
+                 class="font-mono text-sm hover:text-accent">k3s-client ↗</a>
+              <a href="https://pypi.org/project/k3s-client/" target="_blank" rel="noopener">
+                <img src="https://img.shields.io/pypi/v/k3s-client?label=pypi&color=3fb950" alt="k3s-client on PyPI" height="20" />
+              </a>
+            </div>
+            <p class="mt-3 flex-1 text-sm text-dim">In-cluster orchestration for K3s: server-side apply, real dry runs, node pinning. Author and lead developer.</p>
+            <button class="copy mt-4 flex items-center justify-between rounded-md border border-line bg-bg px-3 py-2 font-mono text-xs text-dim hover:text-ink"
+                    data-copy="pip install k3s-client">
+              <span><span class="text-ok">$</span> pip install k3s-client</span><span class="copy-label">copy</span>
+            </button>
+          </div>
+
+          <!-- cluster-builder -->
+          <div class="flex flex-col rounded-lg border border-line bg-panel p-5 hover:border-accent">
+            <div class="flex items-center justify-between gap-2">
+              <a href="https://github.com/Swarmchestrate/cluster-builder" target="_blank" rel="noopener"
+                 class="font-mono text-sm hover:text-accent">cluster-builder ↗</a>
+              <a href="https://pypi.org/project/cluster-builder/" target="_blank" rel="noopener">
+                <img src="https://img.shields.io/pypi/v/cluster-builder?label=pypi&color=3fb950" alt="cluster-builder on PyPI" height="20" />
+              </a>
+            </div>
+            <p class="mt-3 flex-1 text-sm text-dim">Cluster provisioning across AWS, OpenStack and Raspberry Pi, built on OpenTofu. Co-developer.</p>
+            <button class="copy mt-4 flex items-center justify-between rounded-md border border-line bg-bg px-3 py-2 font-mono text-xs text-dim hover:text-ink"
+                    data-copy="pip install cluster-builder">
+              <span><span class="text-ok">$</span> pip install cluster-builder</span><span class="copy-label">copy</span>
+            </button>
+          </div>
+
+          <!-- docker-stress-ng -->
+          <div class="flex flex-col rounded-lg border border-line bg-panel p-5 hover:border-accent">
+            <div class="flex items-center justify-between gap-2">
+              <a href="https://github.com/kotak-Gunjan/docker-stress-ng" target="_blank" rel="noopener"
+                 class="font-mono text-sm hover:text-accent">docker-stress-ng ↗</a>
+              <span class="rounded bg-accent/15 px-2 py-0.5 font-mono text-[11px] text-accent">multi-arch</span>
+            </div>
+            <p class="mt-3 flex-1 text-sm text-dim">Load testing image for amd64, arm64 and armv7, built with buildx in GitHub Actions.</p>
+            <button class="copy mt-4 flex items-center justify-between rounded-md border border-line bg-bg px-3 py-2 font-mono text-xs text-dim hover:text-ink"
+                    data-copy="docker pull gunjank05/stress-ng">
+              <span><span class="text-ok">$</span> docker pull gunjank05/stress-ng</span><span class="copy-label">copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TODO: when you publish a blog post or a PR to another project, add it here. -->
+      </div>
+    </section>
+
+    <!-- ============================== 6. EXPERIENCE & EDUCATION ============================== -->
+    <section id="experience" class="border-t border-line">
+      <div class="reveal mx-auto max-w-6xl px-5 py-20">
+        <p class="font-mono text-xs text-ok">// 04</p>
+        <h2 class="mt-1 text-2xl font-semibold md:text-3xl">Experience &amp; education</h2>
+
+        <!-- Timeline: one <li> per role -->
+        <ol class="relative mt-10 border-l border-line pl-8">
+          <li class="mb-10">
+            <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-bg bg-ok"></span>
+            <p class="font-mono text-xs text-dim">Jul 2024 - Present · London</p>
+            <h3 class="mt-1 text-lg font-semibold">Research Associate (Research Software Engineer)</h3>
+            <p class="text-accent">University of Westminster</p>
+            <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-dim">
+              <li>Swarmchestrate: built and published cluster-builder and k3s-client on PyPI for cluster provisioning and in-cluster orchestration.</li>
+              <li>Deployed Headscale for secure WireGuard networking between cloud and edge nodes.</li>
+              <li>Implemented automatic HTTPS for edge apps using Traefik Ingress and Let's Encrypt, so services run on ports 80/443 with no manual certificate steps.</li>
+              <li>Helped build the end-to-end testbed, from resource registration to application deployment.</li>
+            </ul>
+          </li>
+
+          <li class="mb-10">
+            <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-bg bg-accent"></span>
+            <p class="font-mono text-xs text-dim">Sep 2022 - Jan 2024 · Leicester</p>
+            <h3 class="mt-1 text-lg font-semibold">MSc Advanced Computer Science, Distinction</h3>
+            <p class="text-accent">University of Leicester</p>
+          </li>
+
+          <li class="mb-10">
+            <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-bg bg-line"></span>
+            <p class="font-mono text-xs text-dim">Sep 2019 - Jul 2022 · Bengaluru</p>
+            <h3 class="mt-1 text-lg font-semibold">Senior Software Engineer</h3>
+            <p class="text-accent">LTI (now LTIMindtree)</p>
+            <p class="mt-1 font-mono text-xs text-dim">Graduate Engineering Trainee → Software Engineer → Senior Software Engineer</p>
+            <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-dim">
+              <li>IoT data platform for Scania, handling data streams from warehouse and factory floor devices.</li>
+              <li>Java / Spring Boot microservices with REST APIs, containerised with Docker and run on Marathon (Apache Mesos).</li>
+              <li>CI/CD pipelines for consistent releases; MongoDB for registration data, InfluxDB and Grafana for device telemetry.</li>
+            </ul>
+          </li>
+
+          <li>
+            <span class="absolute -left-[7px] mt-1.5 h-3.5 w-3.5 rounded-full border-2 border-bg bg-line"></span>
+            <p class="font-mono text-xs text-dim">2015 - 2019 · India</p>
+            <h3 class="mt-1 text-lg font-semibold">BEng Information Technology</h3>
+            <p class="text-accent">SSGMCE, Shegaon</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============================== 7. CONTACT ============================== -->
+    <section id="contact" class="border-t border-line">
+      <div class="reveal mx-auto grid max-w-6xl gap-10 px-5 py-20 md:grid-cols-2">
+        <div>
+          <p class="font-mono text-xs text-ok">// 05</p>
+          <h2 class="mt-1 text-2xl font-semibold md:text-3xl">Let's talk</h2>
+          <p class="mt-4 text-dim">Open to Platform Engineering, DevOps, cloud infrastructure and Research Software Engineering roles in the UK.</p>
+
+          <div class="mt-8 space-y-3">
+            <a href="resume.pdf" download
+               class="flex items-center justify-between rounded-lg border border-line bg-panel p-4 hover:border-accent">
+              <span><span class="block font-medium">Download resume</span><span class="font-mono text-xs text-dim">resume.pdf</span></span>
+              <span class="font-mono text-accent">↓</span>
+            </a>
+            <button class="copy flex w-full items-center justify-between rounded-lg border border-line bg-panel p-4 text-left hover:border-accent"
+                    data-copy="kotakgunjan5@gmail.com">
+              <span><span class="block font-medium">kotakgunjan5@gmail.com</span><span class="copy-label font-mono text-xs text-dim">click to copy</span></span>
+              <span class="font-mono text-accent">⧉</span>
+            </button>
+          </div>
+        </div>
+
+        <!--
+          Contact form.
+          Default: opens the visitor's email app with the message filled in (works anywhere).
+          Optional: create a free form at https://formspree.io, then set FORMSPREE_URL in the script
+          below to send messages straight to your inbox without opening an email app.
+        -->
+        <form id="contactForm" class="space-y-4 rounded-lg border border-line bg-panel p-6">
+          <div>
+            <label for="name" class="font-mono text-xs text-dim">name</label>
+            <input id="name" name="name" required autocomplete="name"
+              class="mt-1 w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent" />
+          </div>
+          <div>
+            <label for="email" class="font-mono text-xs text-dim">email</label>
+            <input id="email" name="email" type="email" required autocomplete="email"
+              class="mt-1 w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent" />
+          </div>
+          <div>
+            <label for="message" class="font-mono text-xs text-dim">message</label>
+            <textarea id="message" name="message" rows="4" required
+              class="mt-1 w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none focus:border-accent"></textarea>
+          </div>
+          <button type="submit"
+            class="w-full rounded-md bg-ok px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110">
+            $ send --message
+          </button>
+          <p id="formStatus" class="font-mono text-xs text-dim" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line py-8 text-center font-mono text-xs text-dim">
+    © <span id="year"></span> Gunjan Kotak · deployed on GitHub Pages ·
+    <a href="#top" class="hover:text-ink">back to top ↑</a>
+  </footer>
+
+  <!-- ============================== SCRIPTS ============================== -->
+  <script>
+    /* ---------- Config ---------- */
+    const EMAIL = 'kotakgunjan5@gmail.com';
+    const FORMSPREE_URL = ''; // e.g. 'https://formspree.io/f/abcdwxyz' (leave empty to use the email app)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sleep = (ms) => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
+
+    /* ---------- Footer year ---------- */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ---------- Dark / light toggle (choice is remembered) ---------- */
+    const themeIcon = document.getElementById('themeIcon');
+    const setIcon = () => { themeIcon.textContent = document.documentElement.classList.contains('light') ? '☾' : '☀'; };
+    setIcon();
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const light = document.documentElement.classList.toggle('light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (e) {}
+      setIcon();
+    });
+
+    /* ---------- Mobile menu ---------- */
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('hidden') === false;
+      menuBtn.setAttribute('aria-expanded', open);
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    /* ---------- Scroll progress bar ---------- */
+    const progress = document.getElementById('progress');
+    window.addEventListener('scroll', () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      progress.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    }, { passive: true });
+
+    /* ---------- Hero terminal: types commands, prints output ---------- */
+    const lines = [
+      { t: '$ whoami', c: 'text-ink' },
+      { t: 'platform-engineer @ university-of-westminster', c: '' },
+      { t: '$ kubectl get nodes', c: 'text-ink' },
+      { t: 'NAME       STATUS   ROLES', c: '' },
+      { t: 'aws-1      Ready    control-plane,master', c: 'text-ok' },
+      { t: 'osk-2      Ready    <none>', c: 'text-ok' },
+      { t: 'pi5-edge   Ready    <none>', c: 'text-ok' },
+      { t: '$ pip install cluster-builder k3s-client', c: 'text-ink' },
+      { t: 'Successfully installed cluster-builder k3s-client', c: 'text-ok' },
+      { t: '$ ', c: 'text-ink', cursor: true },
+    ];
+    (async function typeTerminal() {
+      const term = document.getElementById('terminal');
+      for (const line of lines) {
+        const span = document.createElement('span');
+        span.className = 'block ' + line.c;
+        term.appendChild(span);
+        if (line.t.startsWith('$') && !reduceMotion) {
+          for (const ch of line.t) { span.textContent += ch; await sleep(35); }  // commands are "typed"
+        } else {
+          span.textContent = line.t;                                             // output appears at once
+        }
+        if (line.cursor) span.classList.add('cursor');
+        await sleep(250);
+      }
+    })();
+
+    /* ---------- Metric counters animate when the strip comes into view ---------- */
+    const counters = document.querySelectorAll('.count');
+    new IntersectionObserver((entries, obs) => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      counters.forEach(el => {
+        const to = +el.dataset.to;
+        if (reduceMotion) { el.textContent = to; return; }
+        let n = 0;
+        const step = () => { el.textContent = n; if (n++ < to) setTimeout(step, 120); };
+        step();
+      });
+      obs.disconnect();
+    }, { threshold: 0.5 }).observe(document.getElementById('metrics'));
+
+    /* ---------- Case study tabs ---------- */
+    const tabs = document.querySelectorAll('.tab');
+    const cases = document.querySelectorAll('.case');
+    function showCase(id) {
+      cases.forEach(c => c.classList.toggle('hidden', c.id !== id));
+      tabs.forEach(t => {
+        const on = t.dataset.tab === id;
+        t.classList.toggle('border-accent', on);
+        t.classList.toggle('text-accent', on);
+        t.classList.toggle('text-dim', !on);
+        t.setAttribute('aria-selected', on);
+      });
+    }
+    tabs.forEach(t => t.addEventListener('click', () => showCase(t.dataset.tab)));
+    showCase('cs1');
+
+    /* ---------- Copy buttons (install commands and email) ---------- */
+    document.querySelectorAll('.copy').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const label = btn.querySelector('.copy-label');
+        const original = label.textContent;
+        try { await navigator.clipboard.writeText(btn.dataset.copy); label.textContent = 'copied ✓'; }
+        catch { label.textContent = 'press Ctrl+C'; }
+        setTimeout(() => (label.textContent = original), 2000);
+      });
+    });
+
+    /* ---------- Contact form ---------- */
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const status = document.getElementById('formStatus');
+      const data = { name: f.elements.name.value, email: f.elements.email.value, message: f.elements.message.value };
+
+      if (FORMSPREE_URL) {
+        status.textContent = 'sending...';
+        try {
+          const res = await fetch(FORMSPREE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(data),
+          });
+          status.textContent = res.ok ? '200 OK · message sent, thank you.' : 'error · please email me directly.';
+          if (res.ok) f.reset();
+        } catch { status.textContent = 'network error · please email me directly.'; }
+      } else {
+        const subject = encodeURIComponent('Portfolio enquiry from ' + data.name);
+        const body = encodeURIComponent(data.message + '\n\n' + data.name + ' (' + data.email + ')');
+        window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+        status.textContent = 'opening your email app...';
+      }
+    });
+
+    /* ---------- Reveal sections on scroll ---------- */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('show'); io.unobserve(en.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
